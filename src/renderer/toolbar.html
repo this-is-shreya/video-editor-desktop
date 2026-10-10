@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+
+<style>
+  html,body{margin:0;height:100%;background:transparent;overflow:hidden;font:13px "Segoe UI Variable Text","Segoe UI",system-ui,sans-serif;color:#e7e9ee;-webkit-user-select:none;user-select:none}
+  .bar{margin:6px;height:calc(100% - 12px);border-radius:999px;background:#14161bf2;border:1px solid #3a4050;display:flex;align-items:center;gap:12px;padding:0 10px 0 18px;box-shadow:0 6px 24px #0008;-webkit-app-region:drag}
+  .rec{width:10px;height:10px;border-radius:50%;background:#ff4d5e;animation:p 1.2s infinite}
+  @keyframes p{50%{opacity:.35}}
+  .time{font-variant-numeric:tabular-nums;font-weight:600;min-width:44px}
+  .trk{font-size:12px;padding:3px 10px;border-radius:99px;border:1px solid #3a4050;color:#8d95a5}
+  .trk.on{color:#14161b;background:#ffd86b;border-color:#ffd86b;font-weight:600}
+  button{-webkit-app-region:no-drag;border:0;border-radius:99px;padding:7px 14px;font:inherit;cursor:pointer}
+  #toggle{background:#242833;color:#e7e9ee;border:1px solid #3a4050}
+  #stop{background:#ff4d5e;color:#fff;font-weight:600;margin-left:auto}
+  .count{margin:auto;font-weight:600;font-size:15px}
+  .count b{font-size:22px;color:#ffd86b;margin-left:6px}
+  [hidden]{display:none!important}
+</style></head>
+<body>
+<div class="bar" id="count"><div class="count">Recording starts in <b id="n">3</b></div></div>
+<div class="bar" id="live" hidden>
+  <span class="rec"></span><span class="time" id="t">00:00</span>
+  <span class="trk" id="trk">Cursor off</span>
+  <button id="toggle" title="F9">Track cursor</button>
+  <button id="stop" title="F10">Stop</button>
+</div>
+<script src="toolbar.js"></script>
+</body></html>
