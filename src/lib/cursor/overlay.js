@@ -116,7 +116,7 @@ export function drawCursorOverlay(
   }
 ) {
   if (!style?.enabled || !zoom?.points?.length) return;
-console.log("speed is", speed)
+// console.log("speed is", speed)
   const seg = toSegment(zoom);
 
   // Advance cursor animation faster/slower with the video.

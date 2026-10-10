@@ -356,8 +356,8 @@ export default function CursorPanel({
       <Range
         label="Cursor delay"
         value={style.delayMs}
-        min={-600}
-        max={600}
+        min={-2600}
+        max={2600}
         step={10}
         fmt={(v) => v + " ms"}
         onChange={(v) => set("delayMs", v)}
