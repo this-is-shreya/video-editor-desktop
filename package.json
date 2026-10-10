@@ -1,9 +1,12 @@
 {
   "name": "rookieclip",
   "private": true,
-  "version": "1.0.4",
+  "version": "1.0.5",
   "type": "commonjs",
   "main": "src/main/main.js",
+  "author": {
+     "name": "Shreya Srivastava"
+  },
   "scripts": {
     "dev": "concurrently \"vite\" \"electron .\"",
     "build": "vite build",
