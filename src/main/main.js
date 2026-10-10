@@ -70,6 +70,10 @@ function registerProtocol() {
 function setupAutoUpdates() {
   if (!app.isPackaged) return;
 
+  const log = require('electron-log');
+  autoUpdater.logger = log;
+  log.transports.file.level = 'info';
+
   autoUpdater.autoDownload = true;
   autoUpdater.autoInstallOnAppQuit = true;
 
