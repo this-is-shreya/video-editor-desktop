@@ -28,7 +28,8 @@
       "**/*",
       "!release/**",
       "!node_modules/.vite/**",
-      "!*.log"
+      "!*.log",
+       "!.github/**"
     ],
     "asar": false,
     "asarUnpack": [
