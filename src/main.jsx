@@ -13,6 +13,7 @@ import UploadThing from "./UploadThing";
 import { AppProvider } from "./AppContext.jsx";
 import PaymentSuccess from "./PaymentSuccess.jsx";
 import LoginBrowser from "./LoginBrowser.jsx";
+import UpdateDialog from "./UpdateDialog.jsx";
 
 const isElectron = window.location.protocol === "file:";
 
@@ -30,6 +31,7 @@ createRoot(document.getElementById("root")).render(
           <Route path="/desktop-login" element={<LoginBrowser />} />
         </Routes>
       </Router>
+      {isElectron && <UpdateDialog />}
     </AppProvider>
   </StrictMode>,
 );

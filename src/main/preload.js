@@ -67,4 +67,23 @@ contextBridge.exposeInMainWorld('cursorStudio', {
     },
   },
   openRookieClip: () => ipcRenderer.invoke("app:openRookieClip"),
+  onUpdateStatus: (callback) => {
+  const listener = (_event, data) => callback(data);
+  ipcRenderer.on("updates:status", listener);
+
+  return () => {
+    ipcRenderer.removeListener("updates:status", listener);
+  };
+},
+
+onUpdateProgress: (callback) => {
+  const listener = (_event, data) => callback(data);
+  ipcRenderer.on("updates:progress", listener);
+
+  return () => {
+    ipcRenderer.removeListener("updates:progress", listener);
+  };
+},
+
+installUpdate: () => ipcRenderer.invoke("updates:install"),
 });

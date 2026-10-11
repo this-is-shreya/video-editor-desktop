@@ -68,43 +68,64 @@ function registerProtocol() {
   });
 }
 function setupAutoUpdates() {
-  if (!app.isPackaged) return;
+  if (!app.isPackaged) {
+    console.log("[updates] Skipping updates in development");
+    return;
+  }
 
-  const log = require('electron-log');
+  const log = require("electron-log");
+
   autoUpdater.logger = log;
-  log.transports.file.level = 'info';
+  autoUpdater.logger.transports.file.level = "debug";
 
   autoUpdater.autoDownload = true;
   autoUpdater.autoInstallOnAppQuit = true;
 
+  log.info("[updates] App version:", app.getVersion());
+  log.info("[updates] Platform:", process.platform);
+  log.info("[updates] Packaged:", app.isPackaged);
+  log.info("[updates] Log file:", log.transports.file.getFile().path);
+
   autoUpdater.on("checking-for-update", () => {
-    console.log("[updates] Checking for updates...");
+    log.info("[updates] Checking for updates...");
   });
 
   autoUpdater.on("update-available", (info) => {
-    console.log("[updates] Update available:", info.version);
+    log.info("[updates] Update available:", info.version);
   });
 
-  autoUpdater.on("update-not-available", () => {
-    console.log("[updates] App is up to date.");
+  autoUpdater.on("update-not-available", (info) => {
+    log.info("[updates] No update available. Latest:", info.version);
   });
 
   autoUpdater.on("download-progress", (progress) => {
-    console.log(
-      `[updates] Download progress: ${Math.round(progress.percent)}%`
-    );
-  });
-
-  autoUpdater.on("update-downloaded", (info) => {
-    console.log("[updates] Update downloaded:", info.version);
-  });
-
-  autoUpdater.on("error", (error) => {
-    console.error("[updates] Error:", error.message);
+    log.info("[updates] Download progress:", Math.round(progress.percent) + "%");
   });
 
   autoUpdater.checkForUpdatesAndNotify().catch((error) => {
-    console.error("[updates] Check failed:", error.message);
+    log.error("[updates] Check failed:", error);
+  });
+
+  autoUpdater.on("update-downloaded", (info) => {
+    log.info("[updates] Update downloaded:", info.version);
+
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send("updates:status", {
+        state: "downloaded",
+        version: info.version,
+        message: `RookieClip ${info.version} is ready to install.`,
+      });
+    }
+  });
+
+  autoUpdater.on("error", (error) => {
+    log.error("[updates] Error:", error);
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send("updates:status", {
+        state: "error",
+        message: "The update could not be downloaded. You can try again later.",
+      });
+    }
   });
 }
 // ---------------------------------------------------------------- windows
@@ -203,7 +224,9 @@ const readProject = (id) => JSON.parse(fs.readFileSync(path.join(projectDir(id),
 ipcMain.handle("app:openRookieClip", async () => {
   await shell.openExternal("https://rookieclip.com");
 });
-
+ipcMain.handle("updates:install", () => {
+  autoUpdater.quitAndInstall();
+});
 ipcMain.handle('project:create', () => {
   const id = new Date().toISOString().replace(/[:.]/g, '-');
   fs.mkdirSync(path.join(PROJECTS_DIR, id), { recursive: true });
