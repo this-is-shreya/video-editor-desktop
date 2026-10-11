@@ -376,6 +376,8 @@ const App = () => {
     },
   };
   useEffect(() => {
+    // posthog
+    posthog.capture("desktop", {data: user});
     initOGLTiltRenderer(CANVAS_WIDTH, CANVAS_HEIGHT);
     initFXRenderer();
     const img = new Image();

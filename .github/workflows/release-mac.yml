@@ -1,0 +1,45 @@
+
+name: Build RookieClip for macOS
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-mac:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build React app
+        run: npm run build
+
+      - name: Build macOS installer
+        run: npx electron-builder --mac dmg zip --publish never
+
+      - name: Upload macOS build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: RookieClip-macOS
+          path: |
+            release/*.dmg
+            release/*.zip
+            release/*.yml
+          if-no-files-found: error
+          retention-days: 14
