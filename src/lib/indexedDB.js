@@ -50,13 +50,19 @@ const convertBlobsToUrls = (elements) => {
 };
 
 // ADD
-export const addToIndexedDB = async (elements, zooms, transitions, canvasBg, transcript) => {
+// ADD
+export const addToIndexedDB = async (elements, zooms, transitions, canvasBg, transcript, cursorTracks) => {
   const db = await openDB();
-  console.log("transcript:", transcript)
-  // ✅ do async stuff BEFORE transaction
+
+  // blob URL (session-only) -> element id (stable) BEFORE the URLs get replaced with blobs
+  const cursorTracksByElement = {};
+  for (const el of elements) {
+    const track = cursorTracks?.[el.source];
+    if (track) cursorTracksByElement[el.id] = track;
+  }
+
   const processedElements = await convertBlobUrlsToBlobs(elements);
 
-  // ✅ now start transaction
   const tx = db.transaction(STORE_NAME, "readwrite");
   const store = tx.objectStore(STORE_NAME);
 
@@ -66,7 +72,8 @@ export const addToIndexedDB = async (elements, zooms, transitions, canvasBg, tra
     zooms,
     transitions,
     canvasBg,
-    transcript
+    transcript,
+    cursorTracks: cursorTracksByElement, // keyed by element id now
   });
 
   return new Promise((resolve, reject) => {
@@ -89,16 +96,27 @@ export const getFromIndexedDB = async () => {
       const result = request.result;
 
       if (!result) {
-        resolve({ elements: [], zooms: [], transitions: [], canvasBg: null, cursorData:[], transcript:[] });
+        resolve({ elements: [], zooms: [], transitions: [], canvasBg: null, transcript:[], cursorTracks : {}});
         return;
       }
 
+      // GET (inside request.onsuccess, replacing the final resolve)
+      const elements = convertBlobsToUrls(result.elements);
+
+      // element id -> the NEW blob url that was just created for that element
+      const cursorTracks = {};
+      for (const el of elements) {
+        const track = result.cursorTracks?.[el.id];
+        if (track) cursorTracks[el.source] = track;
+      }
+
       resolve({
-        elements: convertBlobsToUrls(result.elements),
+        elements,
         zooms: result.zooms || [],
         transitions: result.transitions || [],
         canvasBg: result.canvasBg || null,
-        transcript: result.transcript || []
+        transcript: result.transcript || [],
+        cursorTracks,
       });
     };
 

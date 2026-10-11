@@ -17,20 +17,7 @@ export default function PricingCard({ open, onClose, loading = false }) {
   ];
 
   const handleBuyNow = async () => {
-    // console.log("entered buynow")
-    const res = await axios.post(
-      `${import.meta.env.VITE_SERVER_URL}/pay`,
-      {
-        plan: yearly ? "yearly" : "monthly",
-      },
-      {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      },
-    );
-    return res;
+    window.cursorStudio.openRookieClip().catch(() => {});
   };
 
   return (

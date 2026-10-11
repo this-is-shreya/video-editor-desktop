@@ -66,4 +66,5 @@ contextBridge.exposeInMainWorld('cursorStudio', {
       return () => ipcRenderer.removeListener('auth:changed', h);
     },
   },
+  openRookieClip: () => ipcRenderer.invoke("app:openRookieClip"),
 });

@@ -123,6 +123,25 @@ function createMainWindow() {
   mainWindow.setMenuBarVisibility(false);
   mainWindow.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
   // mainWindow.webContents.openDevTools();
+  mainWindow.webContents.on("before-input-event", (event, input) => {
+  const key = input.key.toLowerCase();
+
+  if (
+    input.type === "keyDown" &&
+    (
+      input.key === "F12" ||
+      (input.control && input.shift && ["i", "j", "c"].includes(key))
+    )
+  ) {
+    event.preventDefault();
+  }
+});
+
+if (app.isPackaged) {
+  mainWindow.webContents.on("devtools-opened", () => {
+    mainWindow.webContents.closeDevTools();
+  });
+}
   console.log(path.join(__dirname, "../../src/assets/favicon.ico"))
   console.log("is packaged: ", app.isPackaged)
  if (app.isPackaged) {
@@ -181,6 +200,9 @@ ipcMain.handle('tracking:support', () => ({
 // ---------------------------------------------------------------- IPC: projects
 const projectDir = (id) => safeJoin(PROJECTS_DIR, String(id));
 const readProject = (id) => JSON.parse(fs.readFileSync(path.join(projectDir(id), 'project.json'), 'utf8'));
+ipcMain.handle("app:openRookieClip", async () => {
+  await shell.openExternal("https://rookieclip.com");
+});
 
 ipcMain.handle('project:create', () => {
   const id = new Date().toISOString().replace(/[:.]/g, '-');

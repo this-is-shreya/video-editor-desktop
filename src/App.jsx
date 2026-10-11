@@ -3108,10 +3108,13 @@ if (!zoom && screenVideo) {
         });
       }
     }
-    if (isExport && (!user?.isLoggedIn || !user?.isPaid)) {
-      drawWatermark(ctx, canvas);
-    }
     ctx.restore();
+    if (isExport && (!user?.isLoggedIn || !user?.isPaid)) {
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);   // belt and braces: identity matrix
+      drawWatermark(ctx, canvas);
+      ctx.restore();
+    }
   };
 
   const addEffect = (type) => {
@@ -3854,7 +3857,7 @@ const handleDeleteSubtitle = (wordId, deleting) => {
                     style={{
                       display: "inline-block",
                       padding: "10px 18px",
-                      background: "#ff6414",
+                      background: "#f15818",
                       color: "white",
                       borderRadius: "8px",
                       cursor: "pointer",
@@ -5584,7 +5587,7 @@ const handleDeleteSubtitle = (wordId, deleting) => {
             label="Save"
             onClick={async () => {
               toast.success("Saving project...");
-              addToIndexedDB(elements, zooms, transitions, canvasBg, transcript)
+              addToIndexedDB(elements, zooms, transitions, canvasBg, transcript, cursorTracks)
                 .then(() => {
                   toast.success("Project saved!");
                 })
@@ -6317,6 +6320,7 @@ const handleDeleteSubtitle = (wordId, deleting) => {
                   setCanvasBg(savedData.canvasBg);
                   setOriginalTranscript(savedData.transcript)
                   setTranscript(savedData.transcript);
+                  setCursorTracks(savedData.cursorTracks)
                   setHasSavedData(false);
                 }}
                 style={{
